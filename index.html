@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Preparedness Education System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    <!-- Sign Up Screen -->
+    <div id="signupScreen" class="screen hidden">
+        <h1>Sign Up</h1>
+        <input type="text" id="newUsername" placeholder="Choose Username">
+        <input type="password" id="newPassword" placeholder="Choose Password">
+        <button onclick="signup()">Create Account</button>
+        <p>Already have an account? <a href="#" onclick="showLogin()">Sign In</a></p>
+    </div>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen">
+        <h1>Disaster Prep Login</h1>
+        <input type="text" id="username" placeholder="Username (e.g., student)">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="showSignup()">Sign Up</a></p>
+        <p>Demo: student / pass123</p>
+    </div>
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="screen hidden">
+        <nav>
+            <button onclick="showSection('home')">Home</button>
+            <button onclick="showSection('emergency')">Emergency Contacts</button>
+            <button onclick="showSection('quizzes')">Quizzes</button>
+            <button onclick="showSection('games')">Games (Class Level)</button>
+            <button onclick="showSection('hackathon')">Hackathon Mode (6-10)</button>
+            <button onclick="showSection('advanced')">Advanced Simulation (11-12)</button>
+            <button onclick="showSection('videos')">YouTube Videos</button>
+            <button onclick="logout()">Logout</button>
+            <button onclick="toggleVoice()">Voice Guide</button>
+        </nav>
+
+        <!-- Language Selection -->
+        <div id="languageSelectContainer">
+            <label for="languageSelect">Select Language:</label>
+            <select id="languageSelect" onchange="setLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="hi">हिन्दी</option>
+                <option value="mr">मराठी</option>
+                <option value="es">Español</option>
+                <option value="te">తెలుగు</option>
+            </select>
+        </div>
+
+        <!-- Home Section -->
+        <section id="home" class="section">
+            <div class="home-hero">
+                <div class="home-hero-bg"></div>
+                <div class="home-hero-content">
+                    <h2>
+                        <span class="emoji">🛡️</span>
+                        Welcome to Disaster Prep Portal
+                        <span class="emoji">🌍</span>
+                    </h2>
+                    <p>
+                        <span class="highlight">🌏 Region:</span>
+                        <b>Punjab</b>
+                        <span class="badge-disaster">Flood & Earthquake Zone</span>
+                        <br>
+                        <span class="home-motivate">
+                            <span class="emoji">🚨</span>
+                            <b>Are you ready to become a Disaster Hero?</b>
+                            <span class="emoji">🦸‍♂️🦸‍♀️</span>
+                            <br>
+                            <span style="color:#36d1c4;font-weight:600;">
+                                Learn, Play, and Prepare to Stay Safe!
+                            </span>
+                        </span>
+                    </p>
+                    <div class="home-actions">
+                        <button onclick="showSection('quizzes')" class="home-btn">📝 Take a Quiz</button>
+                        <button onclick="showSection('games')" class="home-btn">🎮 Play a Game</button>
+                        <button onclick="showSection('advanced')" class="home-btn">🗺️ Try Simulation</button>
+                    </div>
+                </div>
+            </div>
+            <div id="progressBar">
+                Progress: <span id="progress">0%</span>
+                <div id="progressFill"></div>
+            </div>
+            <div id="badges">Badges: <span id="badgeList"></span></div>
+            <div class="home-news" id="homeNews"></div>
+        </section>
+
+        <!-- Emergency Contacts -->
+        <section id="emergency" class="section hidden">
+            <h2>Emergency Contacts (Punjab)</h2>
+            <ul>
+                <li>NDMA Helpline: 011-26701700</li>
+                <li>Punjab Disaster Mgmt: 0172-2740271</li>
+                <li>Fire: 101 | Police: 100 | Medical: 108</li>
+                <li>Local School Drill Coordinator: Contact Admin</li>
+            </ul>
+            <button onclick="shareContacts()">Share with Parents</button>
+        </section>
+
+        <!-- Quizzes -->
+        <section id="quizzes" class="section hidden">
+            <h2>Disaster Quizzes</h2>
+            <div id="quizContent"></div>
+        </section>
+
+        <!-- Games for Classes 1-5 -->
+        <section id="games" class="section hidden">
+            <h2>Games for Classes 1-5 (Drag & Drop)</h2>
+            <select id="classLevel">
+                <option value="1">Class 1</option>
+                <option value="2">Class 2</option>
+                <option value="3">Class 3</option>
+                <option value="4">Class 4</option>
+                <option value="5">Class 5</option>
+            </select>
+            <button onclick="startGame()">Start Game</button>
+            <div id="gameArea"></div>
+            <div id="gameScore">Score: 0</div>
+            <div id="levelProgress">Level: 1/5</div>
+        </section>
+
+        <!-- Hackathon Mode Game (Classes 6-10) -->
+        <section id="hackathon" class="section hidden">
+            <h2>Hackathon Mode Game (Classes 6-10)</h2>
+            <p>
+                Welcome to Hackathon Mode! Solve disaster scenarios by making quick decisions.<br>
+                <b>Select your class:</b>
+                <select id="hackathonClass">
+                    <option value="6">Class 6</option>
+                    <option value="7">Class 7</option>
+                    <option value="8">Class 8</option>
+                    <option value="9">Class 9</option>
+                    <option value="10">Class 10</option>
+                </select>
+                <button onclick="startHackathonGame()">Start Hackathon Game</button>
+            </p>
+            <div id="hackathonGameArea"></div>
+            <div id="hackathonScore">Score: 0</div>
+        </section>
+
+        <!-- Advanced Simulation for 11-12 -->
+        <section id="advanced" class="section hidden">
+            <div class="sim-card">
+                <div class="sim-icon">🌊</div>
+                <h2>Real-Time Location-Based Simulation</h2>
+                <p id="simQuestion"></p>
+                <button class="sim-btn" onclick="startAdvancedSimulation()">🚦 Start Simulation</button>
+                <div id="simFeedback" class="sim-feedback"></div>
+                <div id="realMap" class="sim-map"></div>
+                <div id="safePlaces" class="sim-safe"></div>
+            </div>
+        </section>
+
+        <!-- YouTube Learning Videos Section -->
+        <section id="videos" class="section hidden">
+            <h2>Disaster Safety: Watch & Learn</h2>
+            <div class="video-grid" id="videoGrid"></div>
+            <div id="videoPlayer" class="video-player"></div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // --- MULTI-LANGUAGE SUPPORT ---
+        const translations = {
+            en: {
+                home: "Welcome to Disaster Prep Portal",
+                emergency: "Emergency Contacts (Punjab)",
+                quizzes: "Disaster Quizzes",
+                games: "Games for Classes 1-5 (Drag & Drop)",
+                hackathon: "Hackathon Mode Game (Classes 6-10)",
+                advanced: "Real-Time Location-Based Simulation",
+                videos: "Disaster Safety: Watch & Learn",
+                login: "Disaster Prep Login",
+                signup: "Sign Up",
+                logout: "Logout",
+                voice: "Voice Guide",
+                selectClass: "Select your class:",
+                startGame: "Start Game",
+                startHackathon: "Start Hackathon Game",
+                startSimulation: "Start Simulation",
+                shareContacts: "Share with Parents",
+                badges: "Badges",
+                progress: "Progress",
+                region: "Region",
+                floodZone: "Flood & Earthquake Zone",
+                hero: "Are you ready to become a Disaster Hero?",
+                learnPlay: "Learn, Play, and Prepare to Stay Safe!",
+                // Quiz questions
+                quizQuestions: [
+                    { q: "What to do in earthquake?", a: "Drop, Cover, Hold On", options: ["Run", "Drop, Cover, Hold On", "Hide under bed"] },
+                    { q: "What number do you call for fire emergency?", a: "101", options: ["100", "101", "108"] },
+                    { q: "What should you do during a flood?", a: "Move to higher ground", options: ["Swim in water", "Move to higher ground", "Stay in basement"] },
+                    { q: "What is the safest place during a thunderstorm?", a: "Indoors away from windows", options: ["Under a tree", "Indoors away from windows", "On the roof"] },
+                    { q: "What to do if you smell gas?", a: "Open windows and leave", options: ["Light a match", "Open windows and leave", "Ignore it"] }
+                ]
+            },
+            hi: {
+                home: "आपका स्वागत है Disaster Prep Portal में",
+                emergency: "आपातकालीन संपर्क (पंजाब)",
+                quizzes: "आपदा क्विज़",
+                games: "कक्षा 1-5 के लिए खेल (ड्रैग एंड ड्रॉप)",
+                hackathon: "हैकथॉन मोड गेम (कक्षा 6-10)",
+                advanced: "रीयल-टाइम स्थान आधारित सिमुलेशन",
+                videos: "आपदा सुरक्षा: देखें और सीखें",
+                login: "डिजास्टर प्रेप लॉगिन",
+                signup: "साइन अप",
+                logout: "लॉगआउट",
+                voice: "वॉयस गाइड",
+                selectClass: "अपनी कक्षा चुनें:",
+                startGame: "खेल शुरू करें",
+                startHackathon: "हैकथॉन गेम शुरू करें",
+                startSimulation: "सिमुलेशन शुरू करें",
+                shareContacts: "माता-पिता के साथ साझा करें",
+                badges: "बैज",
+                progress: "प्रगति",
+                region: "क्षेत्र",
+                floodZone: "बाढ़ और भूकंप क्षेत्र",
+                hero: "क्या आप आपदा हीरो बनने के लिए तैयार हैं?",
+                learnPlay: "सीखें, खेलें, और सुरक्षित रहने के लिए तैयार रहें!",
+                quizQuestions: [
+                    { q: "भूकंप में क्या करना चाहिए?", a: "नीचे झुकें, ढकें, पकड़ें", options: ["भागें", "नीचे झुकें, ढकें, पकड़ें", "बिस्तर के नीचे छुपें"] },
+                    { q: "आग की आपातकालीन स्थिति में कौन सा नंबर डायल करें?", a: "101", options: ["100", "101", "108"] },
+                    { q: "बाढ़ के दौरान क्या करना चाहिए?", a: "ऊँची जगह पर जाएं", options: ["पानी में तैरें", "ऊँची जगह पर जाएं", "तलघर में रहें"] },
+                    { q: "बिजली गिरने के दौरान सबसे सुरक्षित स्थान कौन सा है?", a: "खिड़कियों से दूर अंदर", options: ["पेड़ के नीचे", "खिड़कियों से दूर अंदर", "छत पर"] },
+                    { q: "अगर गैस की गंध आए तो क्या करें?", a: "खिड़कियाँ खोलें और बाहर जाएं", options: ["माचिस जलाएं", "खिड़कियाँ खोलें और बाहर जाएं", "नज़रअंदाज़ करें"] }
+                ]
+            },
+            mr: {
+                home: "Disaster Prep Portal मध्ये स्वागत आहे",
+                emergency: "आपत्कालीन संपर्क (पंजाब)",
+                quizzes: "आपत्ती क्विझ",
+                games: "इयत्ता 1-5 साठी खेळ (ड्रॅग आणि ड्रॉप)",
+                hackathon: "हॅकथॉन मोड गेम (इयत्ता 6-10)",
+                advanced: "रिअल-टाइम स्थान आधारित सिम्युलेशन",
+                videos: "आपत्ती सुरक्षा: पहा आणि शिका",
+                login: "डिझास्टर प्रेप लॉगिन",
+                signup: "साइन अप",
+                logout: "लॉगआउट",
+                voice: "व्हॉइस गाइड",
+                selectClass: "तुमची इयत्ता निवडा:",
+                startGame: "खेळ सुरू करा",
+                startHackathon: "हॅकथॉन गेम सुरू करा",
+                startSimulation: "सिम्युलेशन सुरू करा",
+                shareContacts: "पालकांसोबत शेअर करा",
+                badges: "बॅजेस",
+                progress: "प्रगती",
+                region: "प्रदेश",
+                floodZone: "पूर आणि भूकंप क्षेत्र",
+                hero: "आपण आपत्ती नायक होण्यासाठी तयार आहात का?",
+                learnPlay: "शिका, खेळा, आणि सुरक्षित राहण्यासाठी तयार व्हा!",
+                quizQuestions: [
+                    { q: "भूकंपात काय करावे?", a: "झुकून, झाकून, धरून ठेवा", options: ["पळा", "झुकून, झाकून, धरून ठेवा", "पलंगाखाली लपवा"] },
+                    { q: "आगीच्या आपत्कालीन परिस्थितीत कोणता नंबर डायल करावा?", a: "101", options: ["100", "101", "108"] },
+                    { q: "पूर येताना काय करावे?", a: "उंच जागी जा", options: ["पाण्यात पोहा", "उंच जागी जा", "तळघरात रहा"] },
+                    { q: "वादळी पावसात सर्वात सुरक्षित जागा कोणती?", a: "खिडक्यांपासून दूर घरात", options: ["झाडाखाली", "खिडक्यांपासून दूर घरात", "छतावर"] },
+                    { q: "गॅसचा वास आला तर काय करावे?", a: "खिडक्या उघडा आणि बाहेर जा", options: ["माचिस पेटवा", "खिडक्या उघडा आणि बाहेर जा", "दुर्लक्ष करा"] }
+                ]
+            },
+            es: {
+                home: "Bienvenido al Portal de Preparación para Desastres",
+                emergency: "Contactos de emergencia (Punjab)",
+                quizzes: "Cuestionarios de desastres",
+                games: "Juegos para clases 1-5 (Arrastrar y soltar)",
+                hackathon: "Modo Hackathon (Clases 6-10)",
+                advanced: "Simulación basada en ubicación en tiempo real",
+                videos: "Seguridad ante desastres: Mira y aprende",
+                login: "Inicio de sesión de preparación para desastres",
+                signup: "Registrarse",
+                logout: "Cerrar sesión",
+                voice: "Guía de voz",
+                selectClass: "Selecciona tu clase:",
+                startGame: "Iniciar juego",
+                startHackathon: "Iniciar Hackathon",
+                startSimulation: "Iniciar simulación",
+                shareContacts: "Compartir con padres",
+                badges: "Insignias",
+                progress: "Progreso",
+                region: "Región",
+                floodZone: "Zona de inundación y terremoto",
+                hero: "¿Estás listo para convertirte en un héroe de desastres?",
+                learnPlay: "¡Aprende, juega y prepárate para estar seguro!",
+                quizQuestions: [
+                    { q: "¿Qué hacer en un terremoto?", a: "Agacharse, cubrirse, sujetarse", options: ["Correr", "Agacharse, cubrirse, sujetarse", "Esconderse bajo la cama"] },
+                    { q: "¿Qué número llamar en caso de incendio?", a: "101", options: ["100", "101", "108"] },
+                    { q: "¿Qué hacer durante una inundación?", a: "Ir a un lugar más alto", options: ["Nadar en el agua", "Ir a un lugar más alto", "Quedarse en el sótano"] },
+                    { q: "¿Cuál es el lugar más seguro durante una tormenta eléctrica?", a: "Dentro lejos de ventanas", options: ["Bajo un árbol", "Dentro lejos de ventanas", "En el techo"] },
+                    { q: "¿Qué hacer si hueles gas?", a: "Abrir ventanas y salir", options: ["Encender un fósforo", "Abrir ventanas y salir", "Ignorarlo"] }
+                ]
+            },
+            te: {
+                home: "Disaster Prep Portal కి స్వాగతం",
+                emergency: "అత్యవసర సంప్రదింపులు (Punjab)",
+                quizzes: "ప్రమాదాల క్విజ్‌లు",
+                games: "తరగతి 1-5 కోసం ఆటలు (డ్రాగ్ & డ్రాప్)",
+                hackathon: "హాకథాన్ మోడ్ గేమ్ (తరగతి 6-10)",
+                advanced: "రియల్-టైమ్ స్థాన ఆధారిత అనుకరణ",
+                videos: "ప్రమాద భద్రత: చూడండి మరియు నేర్చుకోండి",
+                login: "Disaster Prep లాగిన్",
+                signup: "సైన్ అప్",
+                logout: "లాగ్ అవుట్",
+                voice: "వాయిస్ గైడ్",
+                selectClass: "మీ తరగతి ఎంచుకోండి:",
+                startGame: "ఆట ప్రారంభించండి",
+                startHackathon: "హాకథాన్ ప్రారంభించండి",
+                startSimulation: "అనుకరణ ప్రారంభించండి",
+                shareContacts: "తల్లిదండ్రులతో పంచుకోండి",
+                badges: "బాడ్జీలు",
+                progress: "ప్రగతి",
+                region: "ప్రాంతం",
+                floodZone: "ప్రళయం & భూకంపం ప్రాంతం",
+                hero: "మీరు ప్రమాద హీరోగా మారడానికి సిద్ధంగా ఉన్నారా?",
+                learnPlay: "నెర్చుకోండి, ఆడండి, మరియు సురక్షితంగా ఉండటానికి సిద్ధంగా ఉండండి!",
+                quizQuestions: [
+                    { q: "భూకంపం వచ్చినప్పుడు ఏమి చేయాలి?", a: "వంగి, కప్పి, పట్టుకోండి", options: ["పరిగెత్తండి", "వంగి, కప్పి, పట్టుకోండి", "పడక కింద దాగండి"] },
+                    { q: "ఫైర్ ఎమర్జెన్సీకి ఏ నంబర్‌కు కాల్ చేయాలి?", a: "101", options: ["100", "101", "108"] },
+                    { q: "ప్రళయం సమయంలో ఏమి చేయాలి?", a: "ఎత్తైన ప్రదేశానికి వెళ్లండి", options: ["నీటిలో ఈదండి", "ఎత్తైన ప్రదేశానికి వెళ్లండి", "బేస్‌మెంట్‌లో ఉండండి"] },
+                    { q: "మెరుపు వాన సమయంలో అత్యంత సురక్షితమైన ప్రదేశం ఏమిటి?", a: "విండోస్ నుండి దూరంగా ఇంట్లో", options: ["చెట్టు కింద", "విండోస్ నుండి దూరంగా ఇంట్లో", "అడుగు మీద"] },
+                    { q: "గ్యాస్ వాసన వస్తే ఏమి చేయాలి?", a: "విండోస్ తెరవండి మరియు బయటకు వెళ్లండి", options: ["మాచిస్ వెలిగించండి", "విండోస్ తెరవండి మరియు బయటకు వెళ్లండి", "పట్టించుకోకండి"] }
+                ]
+            }
+        };
+
+        let currentLanguage = "en";
+
+        // Utility for translation
+        function t(key) {
+            return translations[currentLanguage][key] || translations["en"][key] || key;
+        }
+
+        // --- VOICE SUPPORT ---
+        function speak(text) {
+            if (!voiceEnabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                // Set language for voice
+                utter.lang = currentLanguage === "hi" ? "hi-IN"
+                    : currentLanguage === "mr" ? "mr-IN"
+                    : currentLanguage === "es" ? "es-ES"
+                    : currentLanguage === "te" ? "te-IN"
+                    : "en-US";
+                utter.rate = 1;
+                utter.pitch = 1;
+                window.speechSynthesis.speak(utter);
+            }
+        }
+
+        // --- LANGUAGE SWITCH ---
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            updateUITranslations();
+            speak(t('home'));
+            // If on quiz/game, reload questions in selected language
+            if (document.getElementById('quizzes') && !document.getElementById('quizzes').classList.contains('hidden')) {
+                startQuiz();
+            }
+        }
+
+        // --- UPDATE UI TEXT ---
+        function updateUITranslations() {
+            // Example: update section headings and buttons
+            document.querySelectorAll('[data-i18n]').forEach(function(el) {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            // You can add more UI updates here as needed
+        }
+
+        // --- QUIZ ---
+        function startQuiz() {
+            let questions = shuffle([...translations[currentLanguage].quizQuestions]);
+            let score = 0;
+            let current = 0;
+            showQuestion();
+
+            function showQuestion() {
+                if (current >= questions.length) {
+                    document.getElementById('quizContent').innerHTML = `
+                        <div class="score-badge">
+                            <span>🏅</span>
+                            <div>${t('progress')}: <b>${score}/${questions.length}</b></div>
+                        </div>
+                    `;
+                    return;
+                }
+                const q = questions[current];
+                speak(q.q);
+                let html = `<p><b>${q.q}</b></p>`;
+                q.options.forEach(function(opt) {
+                    html += `<button class="quiz-btn" onclick="window.checkAnswerQuiz('${opt}')">${opt}</button><br>`;
+                });
+                document.getElementById('quizContent').innerHTML = html;
+            }
+
+            window.checkAnswerQuiz = function(selected) {
+                const q = questions[current];
+                if (selected === q.a) {
+                    speak("Correct answer! Well done.");
+                } else {
+                    speak("Wrong answer. Try again.");
+                }
+                current++;
+                setTimeout(showQuestion, 700);
+            };
+        }
+
+        // --- NAVIGATION ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(function(s) {
+                s.classList.add('hidden');
+            });
+            var section = document.getElementById(sectionId);
+            if (section) section.classList.remove('hidden');
+            speak(t(sectionId));
+            if (sectionId === 'quizzes') {
+                startQuiz();
+            }
+            // ...other section logic...
+        }
+
+        // --- DOM READY ---
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUITranslations();
+            speak(t('home'));
+        });
+    </script>
+</body>
+</html>
